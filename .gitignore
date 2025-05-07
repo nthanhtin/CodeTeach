@@ -26,3 +26,4 @@ __pycache__/
 
 # Misc
 .env
+package-lock.json
