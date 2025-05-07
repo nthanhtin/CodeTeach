@@ -138,39 +138,43 @@ async function loadModel() {
 }
 
 // Function to add a message to the chat
-function addMessage(content, sender) {
+function addMessage(content, sender, isSystemPrompt = false) {
   // Debug information about the content
   console.log(`Adding message from ${sender}:`, {
     contentType: typeof content,
     contentValue: content,
     isNull: content === null,
-    isUndefined: content === undefined
+    isUndefined: content === undefined,
+    isSystemPrompt: isSystemPrompt
   });
-  
+
   // Ensure content is a string to prevent errors
   content = content || '';
-  
-  const chatMessages = document.getElementById('chat-messages');
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `message ${sender}`;
-  
-  const contentDiv = document.createElement('div');
-  contentDiv.className = 'message-content';
-  contentDiv.innerHTML = content; // Using innerHTML to support code formatting
-  
-  messageDiv.appendChild(contentDiv);
-  chatMessages.appendChild(messageDiv);
-  
-  // Store in history if it's user or AI message
-  if (sender === 'user' || sender === 'ai') {
+
+  // Only update the DOM if not a system prompt
+  if (!isSystemPrompt) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = content; // Using innerHTML to support code formatting
+
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Store in history if it's user or AI/assistant message
+  if (sender === 'user' || sender === 'ai' || sender === 'assistant') {
     chatHistory.push({
       role: sender === 'user' ? 'user' : 'assistant',
       content: content
     });
   }
-  
-  // Scroll to bottom
-  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Handle hint button click
@@ -230,10 +234,8 @@ let summarizationState = SummarizationState.NONE;
 async function sendMessage(message, isSystemPrompt = false) {
   if (!message || !llmModel) return;
 
-  // If not a system prompt, display user message
-  if (!isSystemPrompt) {
-    addMessage(message, 'user');
-  }
+  // Always add user message to chatHistory, but only display in chat if not a system prompt
+  addMessage(message, 'user', isSystemPrompt);
 
   // Disable input while processing
   const userInput = document.getElementById('user-input');
@@ -292,19 +294,29 @@ async function sendMessage(message, isSystemPrompt = false) {
     systemPrompt += `\n\n# OBJECTIVE\nGuide the student through the problem-solving process with a focus on learning and skill development rather than just providing answers. Your guidance should build their problem-solving abilities and help them understand the underlying concepts.\n\n# STYLE\nYour explanations should be clear, structured, and educational. Use a step-by-step approach when explaining concepts. Include relevant computer science principles and algorithms where appropriate. When sharing code examples, use clean, well-commented, and efficient code.\n\n# TONE\nBe supportive, patient, and encouraging. Treat mistakes as learning opportunities. Be conversational but professional, like an expert mentor working with a motivated student.\n\n# AUDIENCE\nYour student has programming knowledge but may be unfamiliar with some algorithms and data structures concepts. They learn best through guided discovery rather than direct solutions.\n\n# RESPONSE FORMAT\n- For hints: Provide a relevant hint that guides thinking without revealing the full solution\n- For approaches: Explain the reasoning process, possible algorithms, time/space complexity considerations\n- For code explanations: Analyze the code line by line, highlight strengths/weaknesses, suggest improvements\n- For optimization help: Explain both the theoretical and practical optimizations possible\n- Always use markdown formatting with appropriate syntax highlighting for code blocks\n- For complex algorithms, include step-by-step explanations with examples\n\nToday is ${new Date().toLocaleDateString()}.`;
 
     // Prepare messages array
-    // Only keep the last 6 messages (3 user/assistant pairs)
-    const recentHistory = chatHistory.slice(-6);
-    const messages = [
-      {
-        role: 'system',
-        content: systemPrompt
-      },
-      ...recentHistory,
-      {
-        role: 'user',
-        content: message
-      }
-    ];
+    let messages = [];
+    console.log('[DEBUG] chatHistory before preparing messages:', JSON.stringify(chatHistory, null, 2));
+    if (chatHistory.length <= 6) {
+      messages = [
+        { role: 'system', content: systemPrompt },
+        ...chatHistory
+      ];
+      console.log('[DEBUG] Using full chatHistory for messages, length:', messages.length);
+    } else {
+      // Summarize older messages
+      const oldMessages = chatHistory.slice(0, -6);
+      const summary = await getLLMSummary(
+        oldMessages.map(m => `${m.role}: ${m.content}`).join('\n')
+      );
+      messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'system', content: `Summary of earlier conversation: ${summary}` },
+        ...chatHistory.slice(-6)
+      ];
+      console.log('[DEBUG] Using summarized history. summary:', summary);
+      console.log('[DEBUG] Recent chatHistory for messages:', JSON.stringify(chatHistory.slice(-6), null, 2));
+      console.log('[DEBUG] messages array length:', messages.length);
+    }
 
     console.log('Sending message with conversation history:', messages);
 
@@ -327,13 +339,8 @@ async function sendMessage(message, isSystemPrompt = false) {
       }
     }
 
-    // Store in chat history
-    if (!isSystemPrompt) {
-      chatHistory.push({
-        role: 'assistant',
-        content: streamedContent
-      });
-    }
+    // Always add the AI response to chatHistory using addMessage (UI only updates if not system prompt)
+    addMessage(streamedContent, 'assistant', isSystemPrompt);
 
   } catch (error) {
     console.error('Error generating response:', error);
