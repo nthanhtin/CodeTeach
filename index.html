@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeTeach - LeetCode with WebLLM AI</title>
+  <script type="module" crossorigin src="/assets/index-BzXEv7hF.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CVX3Sfjh.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>CodeTeach</h1>
+      <p class="subtitle">Practice coding problems with WebLLM AI assistance</p>
+    </header>
+    <!-- Modal dialog for problem list -->
+    <div id="problem-modal" class="modal">
+      <div class="modal-content">
+        <span id="close-modal" class="close">&times;</span>
+        <h3>Select a Problem</h3>
+        <div class="problem-filters">
+          <select id="difficulty-filter">
+            <option value="all">All Difficulties</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+          <select id="topic-filter">
+            <option value="all">All Topics</option>
+            <option value="arrays">Arrays</option>
+            <option value="strings">Strings</option>
+            <option value="dynamic-programming">Dynamic Programming</option>
+            <option value="trees">Trees</option>
+            <option value="graphs">Graphs</option>
+          </select>
+        </div>
+        <ul id="problem-list" class="problem-list">
+          <!-- Problem list will be populated by JavaScript -->
+        </ul>
+      </div>
+    </div>
+    <main class="workspace-grid">
+      <!-- Left: Problem description -->
+      <aside class="problem-desc-panel">
+        <div class="problem-header">
+          <h2 id="problem-title"></h2>
+          <span class="difficulty"></span>
+          <button id="change-problem-btn">Change Problem</button>
+        </div>
+        <div id="problem-content" class="problem-content"></div>
+      </aside>
+      <!-- Center: Code editor and output -->
+      <section class="code-workspace">
+        <div class="editor-header">
+          <div class="python-only-label">Python (powered by PyScript)</div>
+          <button id="reset-code-btn">Reset</button>
+        </div>
+        <textarea id="code-editor" class="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" rows="14"></textarea>
+        <div class="editor-actions">
+          <button id="run-code-btn">Run</button>
+          <button id="submit-code-btn">Submit</button>
+        </div>
+        <div id="python-output" class="python-output tall-console"></div>
+      </section>
+      <!-- Right: LLM chat -->
+      <aside class="ai-teacher-sidebar">
+        <div class="ai-header">
+          <h3>WebLLM AI Teacher</h3>
+          <div class="model-selection">
+            <select id="model-select">
+              <option value="Hermes-3-Llama-3.1-8B-q4f16_1-MLC" selected>Hermes-3-Llama-3.1-8B (Default)</option>
+              <option value="Phi-3.5-mini-instruct-q4f32_1-MLC">Phi-3.5-mini (Backup)</option>
+              <option value="Phi-3.5-mini-instruct-q4f16_1-MLC-1k">Phi-3.5-mini (Compact)</option>
+            </select>
+            <button id="load-model-btn">Load AI</button>
+          </div>
+          <div id="model-status">Status: Not loaded</div>
+          <div id="progress-container" class="hidden">
+            <div class="progress-bar">
+              <div id="progress-fill"></div>
+            </div>
+            <div id="progress-text">0%</div>
+          </div>
+        </div>
+        <div class="ai-teacher-chat">
+          <div id="chat-messages" class="chat-messages"></div>
+          <div class="teacher-actions">
+            <button id="hint-btn" class="action-btn" disabled>Get Hint</button>
+            <button id="approach-btn" class="action-btn" disabled>Solution Approach</button>
+            <button id="explain-btn" class="action-btn" disabled>Explain My Code</button>
+            <button id="optimize-btn" class="action-btn" disabled>Optimize My Code</button>
+          </div>
+          <div class="input-area">
+            <textarea id="user-input" placeholder="Ask a question about this problem..." disabled></textarea>
+            <button id="send-btn" disabled>Send</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Pyodide - More stable Python runtime for the browser -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+  
+
+  <!-- Container for Python code execution output -->
+  <div id="pyodide-console" style="display:none;"></div>
+
+</body>
+</html>
