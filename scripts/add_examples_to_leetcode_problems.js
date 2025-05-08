@@ -8,7 +8,7 @@ const problems = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 function extractAllExamples(description) {
   // Find all Input: ... Output: ... pairs
   // Output: should only include the value, not explanations or extra lines
-  const inputRegex = /Input:([^\n]*)/g;
+  const inputRegex = /Input:([^\n]*)/g; 
   // Output: value is up to linebreak, Explanation, or Note
   const outputRegex = /Output:([^\n\r]*)/g;
   const explanationRegex = /(Explanation:|Note:).*/;
