@@ -243,14 +243,15 @@ button:disabled {
 .modal {
   display: none;
   position: fixed;
-  z-index: 99;
+  z-index: 999;
   left: 0;
   top: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0, 0, 0, 0.5);
 }
+
 .modal-content {
   background-color: #fff;
   margin: 5vh auto;
@@ -263,6 +264,7 @@ button:disabled {
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   position: relative;
 }
+
 .close {
   color: #aaa;
   position: absolute;
@@ -273,41 +275,72 @@ button:disabled {
   cursor: pointer;
   z-index: 2;
 }
+
 .close:hover {
   color: #333;
 }
 
-@media (max-width: 1200px) {
-  .workspace-grid {
-    grid-template-columns: 260px 1fr 380px;
-  }
-  .problem-desc-panel {
-    min-width: 200px;
-    max-width: 260px;
-  }
-  .ai-teacher-sidebar {
-    width: 320px;
-    min-width: 220px;
-  }
-}
-@media (max-width: 900px) {
-  .workspace-grid {
-    display: flex;
-    flex-direction: column;
-    height: auto;
-  }
-  .problem-desc-panel, .ai-teacher-sidebar, .code-workspace {
-    max-width: none;
-    min-width: 0;
-    border-right: none;
-  }
-  .problem-desc-panel, .ai-teacher-sidebar {
-    border-bottom: 1px solid #e1e4e8;
-  }
+.problem-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 5px 0;
 }
 
+.problem-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 16px;
+  font-size: 1.05rem;
+  border-bottom: 1px solid #e1e4e8;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
-/* Problem list sidebar */
+.problem-item:hover {
+  background-color: #f5f5f5;
+}
+
+.problem-item.active {
+  background-color: #e3f2fd;
+  border-left: 3px solid #1890ff;
+}
+
+.problem-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.problem-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.topic-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border-radius: 12px;
+  background-color: #e8f4fd;
+  color: #0366d6;
+  white-space: nowrap;
+}
+
+.topic-tag.more {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.no-problems {
+  padding: 16px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
 .problem-list-sidebar {
   width: 240px;
   background-color: #fff;

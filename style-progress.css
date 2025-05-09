@@ -1,0 +1,50 @@
+/* Progress Tracking Styles */
+
+/* Completed problem styling */
+.problem-item.completed {
+  position: relative;
+}
+
+.completion-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  margin-left: 8px;
+  padding: 2px;
+}
+
+/* Progress stats styling */
+.completion-stats {
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  border-left: 4px solid #4caf50;
+}
+
+.completion-stats::before {
+  content: "📊";
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* Hover effect for completed problems */
+.problem-item.completed .problem-item-container {
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+/* Success message in output */
+#python-output:contains("Congratulations") {
+  border-bottom: 2px solid #4caf50;
+  padding-bottom: 12px;
+}
